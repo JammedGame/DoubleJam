@@ -31,12 +31,12 @@ public class GameManager : MonoBehaviour {
 
 	void Countdown()
 	{
-		timeLeft -= Time.deltaTime;
-		countdownTimer.fillAmount = timeLeft / 20;
+		// timeLeft -= Time.deltaTime;
+		// countdownTimer.fillAmount = timeLeft / 20;
 	}
 
 	void BackgroundMove()
 	{
-		background.transform.position = new Vector2(background.transform.position.x, Mathf.Lerp(Screen.height - background.GetComponent<SpriteRenderer>().sprite.rect.height, 0, duskDawnSlider));
+		// background.transform.position = new Vector2(background.transform.position.x, Mathf.Lerp(Screen.height - background.GetComponent<SpriteRenderer>().sprite.rect.height, 0, duskDawnSlider));
 	}
 }
