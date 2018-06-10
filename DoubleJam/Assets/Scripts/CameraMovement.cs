@@ -5,9 +5,9 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour {
 
 	public GameObject player;
-	
-	// Update is called once per frame
+	public float cameraSpeed;
+
 	void LateUpdate () {
-		transform.position = new Vector3(player.transform.position.x, player.transform.position.y, transform.position.z);
+		transform.position = Vector3.Lerp(transform.position, new Vector3(player.transform.position.x, Mathf.Clamp(player.transform.position.y, -1, player.transform.position.y), transform.position.z),cameraSpeed * Time.deltaTime);
 	}
 }

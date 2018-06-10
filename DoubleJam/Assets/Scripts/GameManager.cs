@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour {
 
 	void Start()
 	{
-		print(Screen.height - background.GetComponent<SpriteRenderer>().sprite.rect.height);
 		timeLeft = 20f;
 		countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
 	}
@@ -26,17 +25,11 @@ public class GameManager : MonoBehaviour {
 	void Update()
 	{
 		Countdown();
-		BackgroundMove();
 	}
 
 	void Countdown()
 	{
-		// timeLeft -= Time.deltaTime;
-		// countdownTimer.fillAmount = timeLeft / 20;
-	}
-
-	void BackgroundMove()
-	{
-		// background.transform.position = new Vector2(background.transform.position.x, Mathf.Lerp(Screen.height - background.GetComponent<SpriteRenderer>().sprite.rect.height, 0, duskDawnSlider));
+		timeLeft -= Time.deltaTime;
+		countdownTimer.fillAmount = timeLeft / 20;
 	}
 }
