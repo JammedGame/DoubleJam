@@ -14,16 +14,27 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject background;
 
+	private bool completed = false;
+	public SunRay[] sunRays;
 	Image countdownTimer;
 
 	void Start()
 	{
 		timeLeft = 20f;
 		countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
-	}
+        sunRays = GameObject.FindObjectsOfType<SunRay>();
+
+		var sun = GameObject.Find("Sun");
+		foreach (var sunRay in sunRays)
+		{
+			sunRay.target = sun.transform;
+		}
+
+    }
 
 	void Update()
 	{
+		
 		Countdown();
 	}
 
@@ -31,5 +42,29 @@ public class GameManager : MonoBehaviour {
 	{
 		timeLeft -= Time.deltaTime;
 		countdownTimer.fillAmount = timeLeft / 20;
+		CheckCompleted();
+	}
+
+	void CheckCompleted() {
+		if (completed) {
+			return;
+		}
+		int active = 0;
+        foreach (var sunRay in sunRays)
+        {
+            if (sunRay.active)
+            {
+                active += 1;
+            }
+        }
+        if (active == sunRays.Length)
+        {
+			Completed();
+        }
+	}
+
+	void Completed() {
+		completed = true;
+		print("Complited!");
 	}
 }
