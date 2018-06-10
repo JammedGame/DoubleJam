@@ -3,53 +3,61 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
-	
-	public static GameManager Instance {get;set;}
+public class GameManager : MonoBehaviour
+{
 
-	public float timeLeft;
+    public static GameManager Instance { get; set; }
 
-	[Range(0, 1)]
-	public float duskDawnSlider;
+    public float timeLeft;
 
-	public GameObject background;
+    [Range(0, 1)]
+    public float duskDawnSlider;
 
-	private bool completed = false;
-	public SunRay[] sunRays;
-	Image countdownTimer;
+    private bool completed = false;
+    public SunRay[] sunRays;
+    Image countdownTimer;
 
-	void Start()
-	{
-		timeLeft = 20f;
-		countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
+	public GameObject player;
+	public Player playerScript;
+
+    void Start()
+    {
+        timeLeft = 20f;
+        countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
         sunRays = GameObject.FindObjectsOfType<SunRay>();
 
-		var sun = GameObject.Find("Sun");
-		foreach (var sunRay in sunRays)
-		{
-			sunRay.target = sun.transform;
-		}
+        var sun = GameObject.Find("Sun");
+        foreach (var sunRay in sunRays)
+        {
+            sunRay.target = sun.transform;
+        }
+
+		playerScript = player.GetComponent<Player>();
 
     }
 
-	void Update()
-	{
-		
-		Countdown();
-	}
+    void Update()
+    {
+        Countdown();
+        CheckCompleted();
+    }
 
-	void Countdown()
-	{
-		timeLeft -= Time.deltaTime;
-		countdownTimer.fillAmount = timeLeft / 20;
-		CheckCompleted();
-	}
+    void Countdown()
+    {
+		if (!playerScript.inShadow) {
+            timeLeft -= Time.deltaTime;
+            countdownTimer.fillAmount = timeLeft / 20;
+            CheckDeath();
+        }
+    }
 
-	void CheckCompleted() {
-		if (completed) {
-			return;
-		}
-		int active = 0;
+    void CheckCompleted()
+    {
+        if (completed)
+        {
+            return;
+        }
+        int active = 0;
         foreach (var sunRay in sunRays)
         {
             if (sunRay.active)
@@ -59,12 +67,26 @@ public class GameManager : MonoBehaviour {
         }
         if (active == sunRays.Length)
         {
-			Completed();
+            Completed();
         }
-	}
+    }
 
-	void Completed() {
-		completed = true;
-		print("Complited!");
-	}
+    void CheckDeath()
+    {
+        if (completed)
+        {
+            return;
+        }
+        if (countdownTimer.fillAmount <= 0)
+        {
+			print("Dead");
+			completed = true;
+        }
+    }
+
+    void Completed()
+    {
+        completed = true;
+        print("Complited!");
+    }
 }

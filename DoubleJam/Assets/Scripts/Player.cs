@@ -10,6 +10,8 @@ public class Player : MonoBehaviour {
 
 	Rigidbody2D rb;
 
+	public bool inShadow = false;
+
 	void Start()
 	{
 		glideTimeLeft = 1;
@@ -36,6 +38,10 @@ public class Player : MonoBehaviour {
 		{
 			transform.position = new Vector3(transform.position.x - speed, transform.position.y, transform.position.z);
 		}
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+        }
 	}
 
 	void Jump()
@@ -66,8 +72,10 @@ public class Player : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D col)
 	{
-		if(col.gameObject.CompareTag("Ground")){
-			
+		var sunRay = col.gameObject.GetComponent<SunRay>();
+
+		if(sunRay != null){
+            sunRay.Trigger();
 		}
 	}
 }
