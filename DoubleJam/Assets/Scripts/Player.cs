@@ -2,80 +2,160 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
-	private int jumpAmount, jumpMax;
+    private int jumpAmount, jumpMax;
 
-    public float speed, jumpForce, glideTimeLeft;
+    public float speed, jumpForce, glideFallSpeed;
 
-	Rigidbody2D rb;
+    public GameObject graphics;
+    private Animator animator;
+    private bool isMoving, isGrounded, jump;
 
-	public bool inShadow = false;
+    [SerializeField]
+    private bool airControl;
 
-	void Start()
-	{
-		glideTimeLeft = 1;
-		jumpMax = 2;
-		rb = GetComponent<Rigidbody2D>();
-	}
+    Rigidbody2D rb;
+
+    [SerializeField]
+    private Transform[] groundPoints;
+
+    [SerializeField]
+    private float groundRadius;
+
+    [SerializeField]
+    private LayerMask whatIsGround;
+    public bool inShadow = false;
+    void Start()
+    {
+        // glideTimeLeft = 1;
+        jumpMax = 1;
+        rb = GetComponent<Rigidbody2D>();
+        animator = graphics.GetComponent<Animator>();
+    }
 
     // Update is called once per frame
-    void Update () {
-		Movement();
-	}
+    void FixedUpdate()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
 
-	void Movement()
-	{
-		Jump();
+        isGrounded = IsGrounded();
 
-		// Foward
-		if(Input.GetKey(KeyCode.D)){
-			transform.position = new Vector3(transform.position.x + speed, transform.position.y, transform.position.z);
-		}
+        HandleMovement(horizontal);
+        Flip(horizontal);
 
-		// Back
-		if(Input.GetKey(KeyCode.A))
-		{
-			transform.position = new Vector3(transform.position.x - speed, transform.position.y, transform.position.z);
-		}
+        HandleLayers();
 
-        if (Input.GetKeyDown(KeyCode.E))
+        print(rb.velocity.y);
+
+        ResetValues();
+
+        if (Input.GetKey(KeyCode.Space))
         {
+            rb.gravityScale = 0.5f;
         }
-	}
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rb.gravityScale = 1f;
+        }
 
-	void Jump()
-	{
-		glideTimeLeft -= Time.deltaTime;
-		if(glideTimeLeft < 0)
-		{
-			glideTimeLeft = 1;
-			jumpAmount--;
-			if(jumpAmount <= 0)
-			{
-				jumpAmount = 0;
-			}
-		}
+    }
 
-		if(Input.GetKeyDown(KeyCode.Space))
-		{
-			jumpAmount++;
-			rb.AddForce(transform.up * jumpForce);
-		}
+    void HandleMovement(float horizontal)
+    {
+        Jump();
 
-		// Jump counter
-		if(jumpAmount == jumpMax)
-		{
-			jumpAmount = 0;
-		}
-	}
+        if (rb.velocity.y < -1)
+        {
+            animator.SetBool("Land", true);
+        }
 
-	void OnCollisionEnter2D(Collision2D col)
-	{
-		var sunRay = col.gameObject.GetComponent<SunRay>();
+        if (isGrounded || airControl)
+        {
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        }
 
-		if(sunRay != null){
+        animator.SetFloat("Speed", Mathf.Abs(horizontal));
+
+        if (isGrounded && jump)
+        {
+            isGrounded = false;
+
+            rb.AddForce(new Vector2(0, jumpForce));
+
+            animator.SetTrigger("Jump");
+            animator.SetBool("Land", false);
+        }
+    }
+
+    void Flip(float horizontal)
+    {
+        if (horizontal > 0)
+        {
+            graphics.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+        }
+        else if (horizontal < 0)
+        {
+            graphics.transform.localScale = new Vector3(-0.4f, 0.4f, 0.4f);
+        }
+    }
+
+    void Jump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jump = true;
+        }
+    }
+
+    private void ResetValues()
+    {
+        jump = false;
+    }
+
+    private bool IsGrounded()
+    {
+        if (rb.velocity.y <= 0)
+        {
+            foreach (Transform point in groundPoints)
+            {
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(point.position, groundRadius, whatIsGround);
+
+                for (int i = 0; i < colliders.Length; i++)
+                {
+                    if (colliders[i].gameObject != gameObject)
+                    {
+                        animator.ResetTrigger("Jump");
+                        animator.SetBool("Land", false);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void HandleLayers()
+    {
+        if (!isGrounded)
+        {
+            animator.SetLayerWeight(1, 1);
+        }
+        else
+        {
+            animator.SetLayerWeight(1, 0);
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+
+        var sunRay = col.gameObject.GetComponent<SunRay>();
+
+        if (sunRay != null)
+        {
             sunRay.Trigger();
-		}
-	}
+        }
+    }
 }

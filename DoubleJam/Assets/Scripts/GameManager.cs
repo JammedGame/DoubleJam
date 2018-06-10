@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -33,13 +34,19 @@ public class GameManager : MonoBehaviour
         }
 
 		playerScript = player.GetComponent<Player>();
-
+        if (EditorSceneManager.GetActiveScene().name != "MainMenu")
+        {
+            timeLeft = 20f;
+            countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
+        }
     }
 
     void Update()
     {
-        Countdown();
-        CheckCompleted();
+        if (EditorSceneManager.GetActiveScene().name != "MainMenu")
+        {
+            Countdown();
+        }
     }
 
     void Countdown()
@@ -88,5 +95,10 @@ public class GameManager : MonoBehaviour
     {
         completed = true;
         print("Complited!");
+    }
+
+    public void StartGame()
+    {
+        EditorSceneManager.LoadScene("L0");
     }
 }
