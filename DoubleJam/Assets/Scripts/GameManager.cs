@@ -39,4 +39,9 @@ public class GameManager : MonoBehaviour {
 		timeLeft -= Time.deltaTime;
 		countdownTimer.fillAmount = timeLeft / 20;
 	}
+
+	public void StartGame()
+	{
+		EditorSceneManager.LoadScene("L0");
+	}
 }

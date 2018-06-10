@@ -44,12 +44,31 @@ public class Player : MonoBehaviour {
 		HandleMovement(horizontal);
 		Flip(horizontal);
 
+		HandleLayers();
+
+		print(rb.velocity.y);
+
 		ResetValues();
+
+		if(Input.GetKey(KeyCode.Space))
+		{
+			rb.gravityScale = 0.5f;
+		}
+		if(Input.GetKey(KeyCode.Space))
+		{
+			rb.gravityScale = 1f;
+		}
+
 	}
 
 	void HandleMovement(float horizontal)
 	{
 		Jump();
+
+		if(rb.velocity.y < -1)
+		{
+			animator.SetBool("Land", true);
+		}
 
 		if(isGrounded || airControl)
 		{
@@ -63,6 +82,9 @@ public class Player : MonoBehaviour {
 			isGrounded = false;
 
 			rb.AddForce(new Vector2(0, jumpForce));
+
+			animator.SetTrigger("Jump");
+			animator.SetBool("Land", false);
 		}
 	}
 
@@ -103,11 +125,25 @@ public class Player : MonoBehaviour {
 				{
 					if(colliders[i].gameObject != gameObject)
 					{
+						animator.ResetTrigger("Jump");
+						animator.SetBool("Land", false);
 						return true;
 					}
 				}
 			}
 		}
 		return false;
+	}
+
+	private void HandleLayers()
+	{
+		if(!isGrounded)
+		{
+			animator.SetLayerWeight(1, 1);
+		}
+		else
+		{
+			animator.SetLayerWeight(1, 0);
+		}
 	}
 }
