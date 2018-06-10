@@ -6,7 +6,7 @@ public class MovingPlatform : MonoBehaviour {
 
 	public bool needsButton;
 
-	public PressurePlate buttonThatEnables;
+	public Button buttonThatEnables;
 
 	public GameObject platform;
 	

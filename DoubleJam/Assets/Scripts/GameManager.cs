@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
@@ -18,13 +19,19 @@ public class GameManager : MonoBehaviour {
 
 	void Start()
 	{
-		timeLeft = 20f;
-		countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
+		if(EditorSceneManager.GetActiveScene().name != "MainMenu")
+		{
+			timeLeft = 20f;
+			countdownTimer = GameObject.Find("CountdownTimer").GetComponent<Image>();
+		}
 	}
 
 	void Update()
 	{
-		Countdown();
+		if(EditorSceneManager.GetActiveScene().name != "MainMenu")
+		{
+			Countdown();
+		}
 	}
 
 	void Countdown()
